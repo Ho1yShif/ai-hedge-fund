@@ -176,8 +176,11 @@ def extract_json_from_response(content) -> dict | None:
 def get_agent_model_config(state: AgentState, agent_name: str) -> tuple[str, str]:
     """
     Get model configuration for a specific agent from the state.
-    Falls back to global model configuration if agent-specific config is not available.
-    Always returns valid model_name and model_provider values.
+
+    Falls back to the global model in metadata, then to the system default for
+    whichever provider has a key configured (env vars). Raises ``ValueError`` when
+    no cloud provider is configured, rather than silently forcing a hardcoded
+    OpenAI model — mirrors the get_default_model() path in ``call_llm``.
     """
     request = state.get("metadata", {}).get("request")
 
@@ -187,12 +190,24 @@ def get_agent_model_config(state: AgentState, agent_name: str) -> tuple[str, str
         if model_name and model_provider:
             return model_name, _provider_value(model_provider)
 
-    # Fall back to global configuration (system defaults). The provider must be a
-    # ModelProvider *value* ("OpenAI"), not its enum name ("OPENAI"), or get_model_info
-    # and get_model won't recognize it. See the get_default_model() path in call_llm.
-    model_name = state.get("metadata", {}).get("model_name") or "gpt-5.5"
-    model_provider = state.get("metadata", {}).get("model_provider") or "OpenAI"
-    return model_name, _provider_value(model_provider)
+    # Global model from metadata — use it only when both fields are set, so a stray
+    # model_name can't get paired with a defaulted provider (or vice versa). The
+    # provider must be a ModelProvider *value* ("OpenAI"), not its enum name
+    # ("OPENAI"), or get_model_info and get_model won't recognize it.
+    model_name = state.get("metadata", {}).get("model_name")
+    model_provider = state.get("metadata", {}).get("model_provider")
+    if model_name and model_provider:
+        return model_name, _provider_value(model_provider)
+
+    # Nothing selected: default to the configured provider's model, or fail with a
+    # clear, actionable error (matches call_llm's no-provider branch).
+    default_model = get_default_model()
+    if default_model is None:
+        raise ValueError(
+            "No LLM provider configured. Set an API key (e.g. ANTHROPIC_API_KEY or "
+            "OPENAI_API_KEY), or LLM_API_KEY together with LLM_PROVIDER."
+        )
+    return default_model.model_name, default_model.provider.value
 
 
 def _provider_value(model_provider) -> str:

@@ -65,7 +65,7 @@ export const getModels = async (): Promise<LanguageModel[]> => {
  *
  * Mirrors the backend default so a per-agent node preselects a model whose provider
  * actually has a key (e.g. an Anthropic model on an Anthropic-only deploy) rather than
- * always defaulting to OpenAI's gpt-5.5. Falls back to gpt-5.5 / the first model if the
+ * always defaulting to a fixed provider. Falls back to the first model only if the
  * status endpoint is unavailable.
  */
 export const getDefaultModel = async (): Promise<LanguageModel | null> => {
@@ -89,7 +89,7 @@ export const getDefaultModel = async (): Promise<LanguageModel | null> => {
     } catch {
       // Status unavailable — fall back to the static default below.
     }
-    return models.find(model => model.model_name === "gpt-5.5") || models[0] || null;
+    return models[0] || null;
   } catch (error) {
     console.error('Failed to get default model:', error);
     return null;

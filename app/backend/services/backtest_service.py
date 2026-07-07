@@ -30,8 +30,8 @@ class BacktestService:
         start_date: str,
         end_date: str,
         initial_capital: float,
-        model_name: str = "gpt-5.5",
-        model_provider: str = "OpenAI",
+        model_name: str | None = None,
+        model_provider: str | None = None,
         request: dict = {},
     ):
         """
