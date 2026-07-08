@@ -26,7 +26,8 @@ logger = logging.getLogger(__name__)
 _cache = get_cache()
 
 # The .env.example placeholder — a non-empty but invalid value. Treated as "no key"
-# so a copied-but-unedited placeholder doesn't force a 401 on free tickers.
+# so a copied-but-unedited placeholder is sent as an unauthenticated request (401)
+# rather than a 402, which the callers degrade from gracefully.
 _PLACEHOLDER_FINANCIAL_KEY = "your-financial-datasets-api-key"
 
 # Emit the "invalid/missing FINANCIAL_DATASETS_API_KEY" warning at most once per process
@@ -38,9 +39,9 @@ def _financial_headers(api_key: str | None = None) -> dict:
     """Build request headers for financialdatasets.ai.
 
     Uses ``api_key`` if given, else ``FINANCIAL_DATASETS_API_KEY`` from the environment.
-    A blank/whitespace value or the ``.env.example`` placeholder is treated as unset, so a
-    misconfigured key does not force a 401 — free tickers (e.g. AAPL/NVDA/TSLA) fetch
-    anonymously. Returns ``{"X-API-KEY": key}`` only for a real value.
+    A blank/whitespace value or the ``.env.example`` placeholder is treated as unset.
+    financialdatasets.ai has no free tier, so without a funded key every ticker returns
+    no data; callers degrade gracefully. Returns ``{"X-API-KEY": key}`` only for a real value.
     """
     key = (api_key or os.environ.get("FINANCIAL_DATASETS_API_KEY") or "").strip()
     if not key or key == _PLACEHOLDER_FINANCIAL_KEY:
@@ -89,8 +90,9 @@ def _make_api_request(url: str, headers: dict, method: str = "GET", json_data: d
                 _warned_financial_401 = True
                 logger.warning(
                     "financialdatasets.ai returned 401 — FINANCIAL_DATASETS_API_KEY is "
-                    "missing or invalid; premium data unavailable. Free tickers still work "
-                    "with no key set."
+                    "missing or invalid. No market data will be returned (every ticker "
+                    "shows $N/A / hold 0); financialdatasets.ai has no free tier, so a "
+                    "funded key is required for real runs."
                 )
 
         # Return the response (whether success, other errors, or final 429)

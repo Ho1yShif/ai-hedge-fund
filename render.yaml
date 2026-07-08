@@ -43,8 +43,9 @@ projects:
                 sync: false
               - key: LLM_PROVIDER
                 sync: false
-              # Optional financial-data provider (premium tickers). Free tickers work
-              # without it.
+              # Financial-data provider (market prices + fundamentals). Required for
+              # real runs — financialdatasets.ai has no free tier. Without a funded
+              # key every ticker returns no data ($N/A, hold 0); the app still deploys.
               - key: FINANCIAL_DATASETS_API_KEY
                 sync: false
               # CORS allow-list — auto-wired to the deployed frontend's public URL.
