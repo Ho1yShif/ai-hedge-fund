@@ -2,7 +2,7 @@
 
 Deploy an AI-powered hedge fund on Render in one click. A team of ~19 famous-investor agents — Warren Buffett, Charlie Munger, Michael Burry, Cathie Wood, and more — analyze the tickers you choose and produce trading signals and a final portfolio decision. You get a **FastAPI backend**, a **React web UI**, and a **managed PostgreSQL database**, all wired together automatically.
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Ho1yShif/ai-hedge-fund-on-render)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/render-examples/ai-hedge-fund-on-render)
 
 > [!WARNING]
 > This project is for **educational and research purposes only**. It does **not** place real trades and is not investment advice. See the [Disclaimer](#disclaimer).
