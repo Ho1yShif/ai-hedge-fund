@@ -14,8 +14,9 @@ from src.tools.api import (
     get_financial_metrics,
     get_insider_trades,
 )
-from app.backend.services.graph import run_graph_async, parse_hedge_fund_response
+from app.backend.services.graph import run_graph_async
 from app.backend.services.portfolio import create_portfolio
+from src.main import parse_hedge_fund_response
 
 logger = logging.getLogger(__name__)
 
@@ -389,8 +390,8 @@ class BacktestService:
                     decisions = {}
                     analyst_signals = {}
                     
-            except Exception as e:
-                logger.error(f"Error running graph for {current_date_str}: {e}")
+            except Exception:
+                logger.exception(f"Error running graph for {current_date_str}")
                 decisions = {}
                 analyst_signals = {}
 
