@@ -83,8 +83,8 @@ Set these in the Render Dashboard (the `ai-hedge-fund-api` service's **Environme
 
 | Variable | Required? | What it's for |
 |----------|-----------|---------------|
-| `LLM_API_KEY` | required | API key for your LLM provider. With no `LLM_PROVIDER` set, this is treated as an OpenAI key. Keys: [OpenAI](https://platform.openai.com/), [Anthropic](https://anthropic.com/), [Groq](https://groq.com/), [Google Gemini](https://ai.dev/), [DeepSeek](https://deepseek.com/). |
-| `LLM_PROVIDER` | optional | Provider for `LLM_API_KEY`, one of `OpenAI`, `Anthropic`, `Groq`, `Google`, `DeepSeek`, `OpenRouter`, `xAI`, `Kimi`, `GigaChat`. Leave blank to use OpenAI. |
+| `LLM_API_KEY` | required | API key for your LLM provider — **always required** (there is no keyless or default-to-OpenAI mode; without a key every run fails with `No LLM provider configured`). With `LLM_PROVIDER` unset, this key is used as an **OpenAI** key. Keys: [OpenAI](https://platform.openai.com/), [Anthropic](https://anthropic.com/), [Groq](https://groq.com/), [Google Gemini](https://ai.dev/), [DeepSeek](https://deepseek.com/). |
+| `LLM_PROVIDER` | optional | Provider for `LLM_API_KEY`, one of `OpenAI`, `Anthropic`, `Groq`, `Google`, `DeepSeek`, `OpenRouter`, `xAI`, `Kimi`, `GigaChat`. Leave blank to use your `LLM_API_KEY` as an **OpenAI** key. |
 | `FINANCIAL_DATASETS_API_KEY` | required for real runs | Market data (prices + fundamentals) for all tickers — [financialdatasets.ai](https://financialdatasets.ai/). **No free tier** (see [Cost expectations](#cost-expectations)). Deploy succeeds without it, but every run returns empty (`$N/A`, `hold 0`). |
 | `DATABASE_URL` | auto | Injected from the managed Postgres — **do not set manually**. |
 | `VITE_API_URL` | auto | Injected into the frontend build from the backend's `RENDER_EXTERNAL_URL` (its `https://…onrender.com` URL, slug included) — **do not set manually**. |
@@ -92,7 +92,7 @@ Set these in the Render Dashboard (the `ai-hedge-fund-api` service's **Environme
 
 ### Choosing your LLM
 
-Set `LLM_API_KEY` to an OpenAI key and the app runs on **OpenAI `gpt-5.5`** out of the box — no `LLM_PROVIDER` needed.
+Set `LLM_API_KEY` to an OpenAI key and the app runs on **OpenAI `gpt-5.5`** out of the box — no `LLM_PROVIDER` needed. An LLM key is **always required**: this "default to OpenAI" is only *provider selection* for the key you supply, not a keyless mode. With no LLM key set at all, every run fails with `No LLM provider configured`.
 
 - Leaving `LLM_PROVIDER` blank (or setting it to `OpenAI`) uses the OpenAI default model.
 - To use another provider, set `LLM_PROVIDER` to that provider (e.g. `Anthropic`). The app then **automatically defaults runs to a matching-provider model** and, in the model pickers, **grays out models whose provider has no key** — so you can't accidentally pick a model your key can't run. You can still choose any other enabled model per agent.
