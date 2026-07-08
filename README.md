@@ -7,6 +7,10 @@ Deploy an AI-powered hedge fund on Render in one click. A team of ~19 famous-inv
 > [!WARNING]
 > This project is for **educational and research purposes only**. It does **not** place real trades and is not investment advice. See the [Disclaimer](#disclaimer).
 
+
+https://github.com/user-attachments/assets/04288023-b282-408e-b805-3c427ebe16b0
+
+
 ## Architecture
 
 The [`render.yaml`](render.yaml) Blueprint provisions three resources, grouped under a single **`ai-hedge-fund`** Render project (a `production` environment) so they appear together in the Dashboard:
