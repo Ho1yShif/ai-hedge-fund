@@ -41,14 +41,10 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# graph
-*.png
-
-# Txt files
-*.txt
-
-# PDF files
-*.pdf
+# Generated graph visualization (src/utils/visualize.py writes graph.png).
+# Scoped to the generated file so committed images — README/docs screenshots,
+# the listing preview — aren't silently ignored.
+graph.png
 
 # Frontend
 node_modules
