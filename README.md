@@ -45,7 +45,7 @@ The [`render.yaml`](render.yaml) Blueprint provisions three resources, grouped u
 - **One Blueprint, one project.** `render.yaml` declares the backend, frontend, and database inside a single `ai-hedge-fund` project — no manual service creation, and all resources land in one Dashboard project.
 - **`DATABASE_URL` is auto-wired** from the managed Postgres into the backend. You never set it by hand.
 - **`VITE_API_URL` is auto-wired** from the backend's URL into the frontend build. The front end knows where the API lives with no configuration.
-- **CORS is auto-wired and locked down.** `FRONTEND_URL` is injected from the frontend service's host, so the backend allows exactly that origin (plus localhost for dev) — not a blanket `*.onrender.com`.
+- **CORS is auto-wired and locked down.** `FRONTEND_URL` is injected from the frontend service's host, so the backend allows exactly that origin (plus localhost for dev).
 - **SPA routing** is handled by a static-site rewrite to `index.html`.
 
 ## Prerequisites
@@ -55,7 +55,7 @@ The [`render.yaml`](render.yaml) Blueprint provisions three resources, grouped u
 - **An LLM provider and API key** — pick one of [OpenAI](https://platform.openai.com/), [Anthropic](https://anthropic.com/), [Groq](https://groq.com/), [Google Gemini](https://ai.dev/), or [DeepSeek](https://deepseek.com/), and supply it via `LLM_PROVIDER` + `LLM_API_KEY`.
 
 **Required for real results:**
-- A [Financial Datasets](https://financialdatasets.ai/) API key for market data (stock prices + fundamentals), supplied via `FINANCIAL_DATASETS_API_KEY`. financialdatasets.ai **no longer has a free tier** — the cheapest option is **$20 one-time for 1,000 requests** ([pricing](https://www.financialdatasets.ai/pricing)). Without a funded key, runs still complete but every ticker returns no data (`$N/A`, `hold 0`). The app can deploy without it, but you'll need it before any run produces real signals.
+- A [Financial Datasets](https://financialdatasets.ai/) API key for market data (stock prices + fundamentals), supplied via `FINANCIAL_DATASETS_API_KEY`. financialdatasets.ai **no longer has a free tier** (see [Cost expectations](#cost-expectations)). Without a funded key, runs still complete but every ticker returns no data (`$N/A`, `hold 0`). The app can deploy without it, but you'll need it before any run produces real signals.
 
 ## Deploy
 
@@ -63,7 +63,7 @@ The [`render.yaml`](render.yaml) Blueprint provisions three resources, grouped u
 
 1. **Fork** this repository (the Blueprint deploys from your fork's default branch).
 2. In your fork's README, click the **Deploy to Render** button (update the button URL to point at your fork if you renamed it).
-3. When Render prompts for environment variables, set **`LLM_PROVIDER`** and **`LLM_API_KEY`** (see [Environment variables](#environment-variables)). Leave the rest blank.
+3. When Render prompts for environment variables, set **`LLM_PROVIDER`** **`LLM_API_KEY`**, and **`FINANCIAL_DATASETS_API_KEY`** (see [Environment variables](#environment-variables)). Leave the rest blank.
 4. Click **Apply**. Render builds the backend, builds the frontend, provisions Postgres, and connects them.
 
 > On a fresh **Apply**, Render wires the two services' public URLs to each other automatically (`VITE_API_URL` and `FRONTEND_URL`) — there's no manual URL step.
@@ -85,7 +85,7 @@ Set these in the Render Dashboard (the `ai-hedge-fund-api` service's **Environme
 |----------|-----------|---------------|
 | `LLM_API_KEY` | required | API key for your LLM provider. With no `LLM_PROVIDER` set, this is treated as an OpenAI key. Keys: [OpenAI](https://platform.openai.com/), [Anthropic](https://anthropic.com/), [Groq](https://groq.com/), [Google Gemini](https://ai.dev/), [DeepSeek](https://deepseek.com/). |
 | `LLM_PROVIDER` | optional | Provider for `LLM_API_KEY`, one of `OpenAI`, `Anthropic`, `Groq`, `Google`, `DeepSeek`, `OpenRouter`, `xAI`, `Kimi`, `GigaChat`. Leave blank to use OpenAI. |
-| `FINANCIAL_DATASETS_API_KEY` | required for real runs | Market data (prices + fundamentals) for all tickers — [financialdatasets.ai](https://financialdatasets.ai/). **No free tier**; from $20 one-time ([pricing](https://www.financialdatasets.ai/pricing)). Deploy succeeds without it, but every run returns empty (`$N/A`, `hold 0`). |
+| `FINANCIAL_DATASETS_API_KEY` | required for real runs | Market data (prices + fundamentals) for all tickers — [financialdatasets.ai](https://financialdatasets.ai/). **No free tier** (see [Cost expectations](#cost-expectations)). Deploy succeeds without it, but every run returns empty (`$N/A`, `hold 0`). |
 | `DATABASE_URL` | auto | Injected from the managed Postgres — **do not set manually**. |
 | `VITE_API_URL` | auto | Injected into the frontend build from the backend's `RENDER_EXTERNAL_URL` (its `https://…onrender.com` URL, slug included) — **do not set manually**. |
 | `FRONTEND_URL` | auto | Injected from the frontend's `RENDER_EXTERNAL_URL` and used as the CORS allow-list. Set manually only for a custom frontend domain (comma-separated origins). |
@@ -123,7 +123,9 @@ If a run finishes with no decisions, your flow is missing a Portfolio Manager or
 
 ## Cost expectations
 
-The Blueprint uses **free** plans for all three resources so you can try it at no cost.
+- **Render:** the Blueprint uses **free** plans for all three resources, so you can deploy and try it at no cost.
+- **Financial data:** [financialdatasets.ai](https://www.financialdatasets.ai/pricing) has **no free tier** — the cheapest option is **$20 one-time for 1,000 requests**. You need a funded key before any run returns real signals; without it, every ticker shows `$N/A` / `hold 0`.
+- **LLM usage:** billed by your chosen provider (OpenAI, Anthropic, etc.) per token — cost scales with how many agents and tickers you run.
 
 ## Run locally
 
