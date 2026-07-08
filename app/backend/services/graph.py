@@ -1,5 +1,4 @@
 import asyncio
-import json
 import re
 from langchain_core.messages import HumanMessage
 from langgraph.graph import END, StateGraph
@@ -7,7 +6,9 @@ from langgraph.graph import END, StateGraph
 from app.backend.services.agent_service import create_agent_function
 from src.agents.portfolio_manager import portfolio_management_agent
 from src.agents.risk_manager import risk_management_agent
-from src.main import start
+# parse_hedge_fund_response is re-exported here so existing backend imports
+# (routes/hedge_fund.py, services/backtest_service.py) keep working.
+from src.main import parse_hedge_fund_response, start
 from src.utils.analysts import ANALYST_CONFIG
 from src.graph.state import AgentState
 
@@ -175,18 +176,3 @@ def run_graph(
             },
         },
     )
-
-
-def parse_hedge_fund_response(response):
-    """Parses a JSON string and returns a dictionary."""
-    try:
-        return json.loads(response)
-    except json.JSONDecodeError as e:
-        print(f"JSON decoding error: {e}\nResponse: {repr(response)}")
-        return {}
-    except TypeError as e:
-        print(f"Invalid response type (expected string, got {type(response).__name__}): {e}")
-        return {}
-    except Exception as e:
-        print(f"Unexpected error while parsing response: {e}\nResponse: {repr(response)}")
-        return {}

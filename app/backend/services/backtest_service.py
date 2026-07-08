@@ -1,3 +1,4 @@
+import logging
 import os
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -15,6 +16,9 @@ from src.tools.api import (
 )
 from app.backend.services.graph import run_graph_async, parse_hedge_fund_response
 from app.backend.services.portfolio import create_portfolio
+
+logger = logging.getLogger(__name__)
+
 
 class BacktestService:
     """
@@ -386,7 +390,7 @@ class BacktestService:
                     analyst_signals = {}
                     
             except Exception as e:
-                print(f"Error running graph for {current_date_str}: {e}")
+                logger.error(f"Error running graph for {current_date_str}: {e}")
                 decisions = {}
                 analyst_signals = {}
 

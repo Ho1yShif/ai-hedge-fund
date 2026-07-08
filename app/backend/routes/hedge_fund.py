@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 import asyncio
+import logging
 
 from app.backend.models.schemas import ErrorResponse, HedgeFundRequest, BacktestRequest, BacktestDayResult, BacktestPerformanceMetrics
 from app.backend.models.events import StartEvent, ProgressUpdateEvent, ErrorEvent, CompleteEvent
@@ -9,6 +10,8 @@ from app.backend.services.portfolio import create_portfolio
 from app.backend.services.backtest_service import BacktestService
 from src.utils.progress import progress
 from src.utils.analysts import get_agents_list
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/hedge-fund")
 
@@ -96,7 +99,7 @@ async def run(request_data: HedgeFundRequest, request: Request):
                 while not run_task.done():
                     # Check if client disconnected
                     if disconnect_task.done():
-                        print("Client disconnected, cancelling hedge fund execution")
+                        logger.info("Client disconnected, cancelling hedge fund execution")
                         run_task.cancel()
                         try:
                             await run_task
@@ -116,7 +119,7 @@ async def run(request_data: HedgeFundRequest, request: Request):
                 try:
                     result = await run_task
                 except asyncio.CancelledError:
-                    print("Task was cancelled")
+                    logger.info("Task was cancelled")
                     return
 
                 if not result or not result.get("messages"):
@@ -146,7 +149,7 @@ async def run(request_data: HedgeFundRequest, request: Request):
                 yield final_data.to_sse()
 
             except asyncio.CancelledError:
-                print("Event generator cancelled")
+                logger.info("Event generator cancelled")
                 return
             finally:
                 # Clean up
@@ -282,7 +285,7 @@ async def backtest(request_data: BacktestRequest, request: Request):
                 while not backtest_task.done():
                     # Check if client disconnected
                     if disconnect_task.done():
-                        print("Client disconnected, cancelling backtest execution")
+                        logger.info("Client disconnected, cancelling backtest execution")
                         backtest_task.cancel()
                         try:
                             await backtest_task
@@ -302,7 +305,7 @@ async def backtest(request_data: BacktestRequest, request: Request):
                 try:
                     result = await backtest_task
                 except asyncio.CancelledError:
-                    print("Backtest task was cancelled")
+                    logger.info("Backtest task was cancelled")
                     return
 
                 if not result:
@@ -321,7 +324,7 @@ async def backtest(request_data: BacktestRequest, request: Request):
                 yield final_data.to_sse()
 
             except asyncio.CancelledError:
-                print("Backtest event generator cancelled")
+                logger.info("Backtest event generator cancelled")
                 return
             finally:
                 # Clean up
