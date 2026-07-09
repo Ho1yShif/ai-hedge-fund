@@ -77,6 +77,8 @@ The [`render.yaml`](render.yaml) Blueprint provisions three resources, grouped u
 3. Connect your GitHub account and select your fork. Render reads `render.yaml` automatically.
 4. Fill in the environment variables (below) and click **Apply**.
 
+**Note:** Due to the web service cold start with Alembic migrations, the Components pane on the right-hand side of the flows UI may take some extra time to load. Check the backend logs to monitor and ensure that Alembic migrations have run successfully and Components load in the UI.
+
 ## Environment variables
 
 Set these in the Render Dashboard (the `ai-hedge-fund-api` service's **Environment** tab), at deploy time or later. API keys are read **only** from these environment variables — never entered or stored in the app UI (see [API-key security](#api-key-security)). Supply **one** LLM provider and its key.
